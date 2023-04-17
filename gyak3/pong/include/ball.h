@@ -1,6 +1,7 @@
 #ifndef BALL_H
 #define BALL_H
 #include <stdbool.h>
+#include <GL/gl.h>
 
 /**
  * Ball position and speed
@@ -14,6 +15,8 @@ typedef struct Ball
     float speed_y;
     float acceleration;
     bool is_moving;
+    float rotation_angle;
+    GLuint texture_id;
 } Ball;
 
 void change_ball_size(Ball* ball,float size);

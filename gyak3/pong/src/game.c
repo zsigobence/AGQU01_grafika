@@ -1,6 +1,7 @@
 #include "game.h"
-
+#include "texture.h"
 #include <GL/gl.h>
+
 
 #include <stdio.h>
 
@@ -15,6 +16,7 @@ void init_game(Game* game, int width, int height)
     init_opengl(game);
     init_pong(&(game->pong), width, height);
     game->is_running = true;
+    game->bgTexture = load_texture("assets/textures/pong.jpg");
 }
 
 void destroy_game(Game* game)
@@ -119,6 +121,7 @@ void update_game(Game* game)
 void render_game(Game* game)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    render_background(game);
     render_pong(&(game->pong));
     SDL_GL_SwapWindow(game->window);
 }
@@ -152,6 +155,7 @@ bool init_sdl(Game* game)
         return false;
     }
 
+
     return true;
 }
 
@@ -159,9 +163,27 @@ void init_opengl(Game* game)
 {
     glShadeModel(GL_SMOOTH);
     glClearColor(0.1, 0.1, 0.1, 1.0);
+    glEnable(GL_TEXTURE_2D);
+
+    
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0, game->width, game->height, 0, -200, 200);
     glViewport(0, 0, game->width, game->height);
+    
 }
+
+void render_background(Game* game)
+{
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glBindTexture(GL_TEXTURE_2D, game->bgTexture);
+    glBegin(GL_QUADS);
+    glTexCoord2d(0, 0); glVertex2d(0, 0);
+    glTexCoord2d(1, 0); glVertex2d(game->width, 0);
+    glTexCoord2d(1, 1); glVertex2d(game->width, game->height);
+    glTexCoord2d(0, 1); glVertex2d(0, game->height);
+    glEnd();
+}
+

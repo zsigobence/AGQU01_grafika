@@ -57,9 +57,11 @@ void bounce_ball(Pong* pong)
     if(SDL_HasIntersection(&rightpad,&theball)){
         
         pong->ball.speed_x *= -1;
+        pong->ball.rotation_angle *= -1;
     
     }else if(pong->ball.x  > pong->width ){
             pong->left_pad.score += 1;
+            
             init_ball(&(pong->ball),pong->width / 2,pong->height / 2);
             update_ball_moving(&(pong->ball),false);
             printf("%d--%d\n",pong->left_pad.score,pong->right_pad.score);
@@ -68,6 +70,7 @@ void bounce_ball(Pong* pong)
 
     if(SDL_HasIntersection(&leftpad,&theball)){
         pong->ball.speed_x *= -1;
+        pong->ball.rotation_angle *= -1;
     }else if(pong->ball.x < 0){
     
         pong->right_pad.score += 1;
@@ -79,9 +82,11 @@ void bounce_ball(Pong* pong)
     if (pong->ball.y - pong->ball.radius < 0) {
         pong->ball.y = pong->ball.radius;
         pong->ball.speed_y *= -1;
+        
     }
     if (pong->ball.y + pong->ball.radius > pong->height) {
         pong->ball.y = pong->height - pong->ball.radius;
         pong->ball.speed_y *= -1;
+        
     }
 }

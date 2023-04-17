@@ -17,6 +17,7 @@ typedef struct Game
     int width;
     int height;
     Pong pong;
+    GLuint bgTexture;
 } Game;
 
 /**

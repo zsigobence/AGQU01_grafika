@@ -1,1 +1,2 @@
-# AGQU01_grafika
+# Beadandó feladat specifikációja:
+Egy átlagos labirintus játék ahol a játékosnak ki kell találni a falak között a labirintusból. A labirintus végét egy fel-le mozgó zöld zászló jelzi. A játékos a w,a,s,d billentyűkkel irányíthatják illetve az egérrel forgathatják a kamerát. A játékban lévő fény erejét +,- billentyűkkel lehet állítani illetve az f2 billenytűvel lehet a ködöt bekapcsolni hogy nehezebb legyen a játék. Az f1 billentyű megnyomássára jelenik meg a help menü.

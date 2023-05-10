@@ -20,11 +20,11 @@ void init_scene(Scene* scene)
     load_model(&(scene->hat_model), "assets/models/hat.obj");
     scene->hat_texture_id = load_texture("assets/textures/hat.png");
 
-    
+    scene->grass_texture_id = load_texture("assets/textures/grass.jpg");
 
-    scene->material.ambient.red = 0.0;
-    scene->material.ambient.green = 0.0;
-    scene->material.ambient.blue = 0.0;
+    scene->material.ambient.red = 1.0;
+    scene->material.ambient.green = 1.0;
+    scene->material.ambient.blue = 1.0;
 
     scene->material.diffuse.red = 1.0;
     scene->material.diffuse.green = 1.0;
@@ -35,14 +35,16 @@ void init_scene(Scene* scene)
     scene->material.specular.blue = 1.0;
 
     scene->material.shininess = 10.0;
+    scene->grass_offset = 0;
+    scene->grass_speed = 1;
 }
 
 void set_lighting()
 {
     float ambient_light[] = { 0.0f, 0.0f, 0.0f, 1.0f };
     float diffuse_light[] = { 1.0f, 1.0f, 1.0, 1.0f };
-    float specular_light[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-    float position[] = { 3.0f, 5.0f, 10.0f, 1.0f };
+    float specular_light[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    float position[] = { 0.0f, 5.0f, 10.0f, 1.0f };
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light);
@@ -82,6 +84,7 @@ void update_scene(Scene* scene,double time)
     scene->rotation.x += scene->speed.x * time;
     scene->rotation.y += scene->speed.y * time;
     scene->rotation.z += scene->speed.z * time;
+    scene->grass_offset += scene->grass_speed * time;
 }
 
 void set_scene_rotationx(Scene* scene,double speed){
@@ -102,11 +105,11 @@ void render_scene(const Scene* scene)
     set_lighting();
     draw_origin();
     
- glPushMatrix(); // save the current modelview matrix
-    glTranslatef(scene->position.x, scene->position.y, scene->position.z); // translate to the scene position
-    glRotatef(scene->rotation.x, 1.0, 0.0, 0.0); // rotate around the X-axis
-    glRotatef(scene->rotation.y, 0.0, 1.0, 0.0); // rotate around the Y-axis
-    glRotatef(scene->rotation.z, 0.0, 0.0, 1.0); // rotate around the Z-axis
+ glPushMatrix();
+    glTranslatef(scene->position.x, scene->position.y, scene->position.z); 
+    glRotatef(scene->rotation.x, 1.0, 0.0, 0.0); 
+    glRotatef(scene->rotation.y, 0.0, 1.0, 0.0); 
+    glRotatef(scene->rotation.z, 0.0, 0.0, 1.0); 
 
 
     glBindTexture(GL_TEXTURE_2D, scene->duck_texture_id);
@@ -116,6 +119,9 @@ void render_scene(const Scene* scene)
     glBindTexture(GL_TEXTURE_2D, scene->hat_texture_id);
     draw_model(&(scene->hat_model));
      glPopMatrix();
+
+    glBindTexture(GL_TEXTURE_2D, scene->grass_texture_id);
+    draw_grass(scene);
    
 }
 
@@ -136,4 +142,28 @@ void draw_origin()
     glVertex3f(0, 0, 1);
 
     glEnd();
+}
+
+void draw_grass(const Scene* scene)
+{
+    int size = 100; 
+    double square_size = 0.5; 
+     glPushMatrix();
+    glTranslatef(-(size*square_size)/2 ,-(size*square_size)/2, 0);
+    glBegin(GL_QUADS); 
+    glBindTexture(GL_TEXTURE_2D, scene->grass_texture_id);
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            glTexCoord2f(0.0 + scene->grass_offset, 0.0 + scene->grass_offset);
+            glVertex3f(i * square_size, j * square_size, 0);
+            glTexCoord2f(1.0 + scene->grass_offset, 0.0 + scene->grass_offset);
+            glVertex3f((i + 1) * square_size, j * square_size, 0);
+            glTexCoord2f(1.0 + scene->grass_offset, 1.0 + scene->grass_offset);
+            glVertex3f((i + 1) * square_size, (j + 1) * square_size, 0);
+            glTexCoord2f(0.0 + scene->grass_offset, 1.0 + scene->grass_offset);
+            glVertex3f(i * square_size, (j + 1) * square_size, 0);
+        }
+    }
+    glEnd();
+     glPopMatrix();
 }

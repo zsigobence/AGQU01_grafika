@@ -106,16 +106,16 @@ void draw_triangle(){
 
 void draw_sphere()
 {
- glPushMatrix(); // Elmentjük az aktuális mátrixot
-    glTranslatef(0.5f, 0.5f, 0.5f); // Eltoljuk a gömböt a koordináta rendszer origójától
+ glPushMatrix(); 
+    glTranslatef(0.5f, 0.5f, 0.5f); 
     static float angle = 0.0f;
     angle += 0.01f;
-    glRotatef(angle, 1.0f, 1.0f, 0.0f); // Forgatjuk a gömböt a saját tengelye körül
+    glRotatef(angle, 1.0f, 1.0f, 0.0f); 
     
     float colors[4][3] = { {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 1.0f} };
-    // A színek a vörös, sárga, zöld és cián színek lineáris interpolációjával fognak változni
     
-    int segs = 20; // A gömb felbontása
+    
+    int segs = 20; 
     int rgs = 20;
     float radius = 0.2;
     

@@ -13,9 +13,12 @@ typedef struct Scene
     Material material;
     GLuint hat_texture_id;
     GLuint duck_texture_id;
+    GLuint grass_texture_id;
     vec3 position;
     vec3 rotation;
     vec3 speed;
+    float grass_offset;
+    float grass_speed;
 } Scene;
 
 /**
@@ -50,5 +53,7 @@ void render_scene(const Scene* scene);
  * Draw the origin of the world coordinate system.
  */
 void draw_origin();
+
+void draw_grass(const Scene* scene);
 
 #endif /* SCENE_H */

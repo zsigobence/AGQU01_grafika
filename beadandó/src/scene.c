@@ -27,8 +27,7 @@ void init_scene(Scene* scene)
     
     scene->fogenable = 0;
     scene->showhelp = 0;
-    scene->numParticles = 300;
-    initParticles(scene);
+    init_button(&(scene->button));
     
 }
 
@@ -78,7 +77,7 @@ void update_scene(Scene* scene,double time)
     
     flag_movement(&(scene->flag),time);
     collision_detection(scene);
-    updateParticles(scene);
+    updateParticles(&(scene->button));
 }
 
 void render_scene(const Scene* scene)
@@ -89,9 +88,8 @@ void render_scene(const Scene* scene)
     render_flag(&(scene->flag));
     render_walls(scene->wall);
     
-    render_button();
     render_roof();
-    drawParticles(scene);
+    render_button(&(scene->button));
     
     
 }
@@ -116,6 +114,7 @@ glPopMatrix();
 
 void render_roof(){
     glDisable(GL_TEXTURE_2D);
+    glEnable(GL_COLOR_MATERIAL);
 glPushMatrix();
     glColor4f(0.3f, 0.3f, 0.3f, 1.0f);
     glBegin(GL_QUADS);
@@ -126,25 +125,14 @@ glPushMatrix();
    glEnd();
 glPopMatrix();
 glEnable(GL_TEXTURE_2D);
+    glDisable(GL_COLOR_MATERIAL);
 }
 
-void render_button(){
-    glDisable(GL_TEXTURE_2D);
-glPushMatrix();
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glBegin(GL_QUADS);
-    glVertex3f(0.7f, -0.7f, 0.001f);
-    glVertex3f(1.3f, -0.7f, 0.001f);
-    glVertex3f(1.3f, -1.3f, 0.001f);
-    glVertex3f(0.7f, -1.3f, 0.001f);
-    glEnd();
-glPopMatrix();
-    glEnable(GL_TEXTURE_2D);
-}
+
 
 void collision_detection(Scene* scene){
     Rect wall[15];
-    Rect camera = {scene->camera.position.x - 0.1,scene->camera.position.y - 0.1,0.1,0.2};
+    Rect camera = {scene->camera.position.x - 0.1,scene->camera.position.y - 0.1,0.2,0.2};
     Wall walls;
     Rect flag = {scene->flag.position.x + 0.1,scene->flag.position.y + 0.3,0.2,0.6};
     Rect button = {0.6 , -0.8 , 0.5 , 0.5};
@@ -297,57 +285,3 @@ void end_game(Scene *scene)
     glEnable(GL_DEPTH_TEST);
 }
 
-void initParticles(Scene *scene) {
-    int i;
-    for (i = 0; i < scene->numParticles; i++) {
-        scene->particles[i].position[0] = 1;
-        scene->particles[i].position[1] = -1 ;
-        scene->particles[i].position[2] = 0.002;
-
-        scene->particles[i].speed[0] = (float)(rand() % 200 - 100) / 70000.0f;
-        scene->particles[i].speed[1] = (float)(rand() % 200 - 100) / 70000.0f;
-
-        scene->particles[i].color[0] = 1.0;
-        scene->particles[i].color[1] = (float)(rand() % 100) / 200;
-        scene->particles[i].color[2] = 0.001;
-    }
-}
-
-void updateParticles(Scene *scene) {
-    int i;
-    for (i = 0; i < scene->numParticles; i++) {
-        scene->particles[i].position[0] += scene->particles[i].speed[0];
-        scene->particles[i].position[1] -= scene->particles[i].speed[1];
-        
-
-         
-        if (scene->particles[i].position[1] < -1.3) {
-            scene->particles[i].position[0] = 1;
-            scene->particles[i].position[1] = -1;
-        }
-        if (scene->particles[i].position[1] > -0.7) {
-            scene->particles[i].position[0] = 1;
-            scene->particles[i].position[1] = -1;
-        }
-        if (scene->particles[i].position[0] < 0.7) {
-            scene->particles[i].position[0] = 1;
-            scene->particles[i].position[1] = -1;
-        }
-        if (scene->particles[i].position[0] > 1.3) {
-            scene->particles[i].position[0] = 1;
-            scene->particles[i].position[1] = -1;
-        }
-    }
-}
-
-
-void drawParticles(const Scene *scene) {
-    
-    glPointSize(9.0f);
-     glBegin(GL_POINTS);
-    for (int i = 0; i < scene->numParticles; i++) {
-        glColor3fv(scene->particles[i].color);
-        glVertex3fv(scene->particles[i].position);
-    }
-    glEnd();
-}

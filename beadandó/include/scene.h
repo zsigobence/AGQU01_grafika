@@ -8,14 +8,10 @@
 #include <SDL2/SDL.h>
 #include "camera.h"
 #include <GL/glut.h>
-
+#include <button.h>
 #include <obj/model.h>
 
-typedef struct {
-    float position[3];
-    float speed[3];
-    float color[3];
-} Particle;
+
 
 typedef struct Scene
 {
@@ -29,8 +25,7 @@ typedef struct Scene
     int showhelp;
     int game_end;
     double cursorpos;
-    Particle particles[300];
-    int numParticles;
+    Button button;
 } Scene;
 
 typedef struct Rect
@@ -79,7 +74,7 @@ void render_floor(const Scene* scene);
  */
 void render_roof();
 
-void render_button();
+
 
 /**
  * Detects the collision between the walls and the camera
@@ -101,9 +96,7 @@ void help_menu(Scene *scene);
 */
 void end_game(Scene *scene);
 
-void initParticles(Scene *scene) ;
-void updateParticles(Scene *scene);
-void drawParticles(const Scene *scene);
+
 
 
 #endif /* SCENE_H */

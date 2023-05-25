@@ -7,8 +7,15 @@
 #include "walls.h"
 #include <SDL2/SDL.h>
 #include "camera.h"
+#include <GL/glut.h>
 
 #include <obj/model.h>
+
+typedef struct {
+    float position[3];
+    float speed[3];
+    float color[3];
+} Particle;
 
 typedef struct Scene
 {
@@ -16,12 +23,14 @@ typedef struct Scene
     Camera camera;
     Material material;
     Flag flag;
-    Wall wall[14];
+    Wall wall[15];
     GLuint floor_texture_id;
     int fogenable;
     int showhelp;
     int game_end;
     double cursorpos;
+    Particle particles[300];
+    int numParticles;
 } Scene;
 
 typedef struct Rect
@@ -31,6 +40,8 @@ typedef struct Rect
     float w;
     float h;
 } Rect;
+
+
 
 /**
  * Initialize the scene by loading models.
@@ -63,17 +74,36 @@ void render_scene(const Scene* scene);
  */
 void render_floor(const Scene* scene);
 
+/**
+ * Render the roof of the scene.
+ */
+void render_roof();
+
+void render_button();
 
 /**
- * .
+ * Detects the collision between the walls and the camera
  */
 void collision_detection(Scene* scene);
 
+/*
+* Gives true value if the two Rect intersects
+*/
 bool has_intersection(const Rect * A, const Rect * B);
 
+/*
+* Render the help menu
+*/
 void help_menu(Scene *scene);
 
+/*
+* Render the end game screen
+*/
 void end_game(Scene *scene);
+
+void initParticles(Scene *scene) ;
+void updateParticles(Scene *scene);
+void drawParticles(const Scene *scene);
 
 
 #endif /* SCENE_H */

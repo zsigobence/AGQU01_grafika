@@ -1,6 +1,7 @@
 #include "scene.h"
 #include <obj/load.h>
 #include <obj/draw.h>
+#include <Windows.h>
 
 void init_scene(Scene* scene)
 {   
@@ -22,11 +23,12 @@ void init_scene(Scene* scene)
     scene->material.specular.green = 0.5;
     scene->material.specular.blue = 0.5;
 
-    scene->material.shininess = 10.0;
+    scene->material.shininess = 100.0;
     
     scene->fogenable = 0;
     scene->showhelp = 0;
-    
+    scene->numParticles = 300;
+    initParticles(scene);
     
 }
 
@@ -68,12 +70,15 @@ void set_material(const Material* material)
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular_material_color);
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, &(material->shininess));
+
 }
 
 void update_scene(Scene* scene,double time)
-{
+{   
+    
     flag_movement(&(scene->flag),time);
     collision_detection(scene);
+    updateParticles(scene);
 }
 
 void render_scene(const Scene* scene)
@@ -83,6 +88,11 @@ void render_scene(const Scene* scene)
     render_floor(scene);
     render_flag(&(scene->flag));
     render_walls(scene->wall);
+    
+    render_button();
+    render_roof();
+    drawParticles(scene);
+    
     
 }
 
@@ -104,12 +114,41 @@ glPushMatrix();
 glPopMatrix();
 }
 
+void render_roof(){
+    glDisable(GL_TEXTURE_2D);
+glPushMatrix();
+    glColor4f(0.3f, 0.3f, 0.3f, 1.0f);
+    glBegin(GL_QUADS);
+   glVertex3f(-1.0, 0.5, 1.0);
+   glVertex3f(6.5, 0.5, 1.0);
+   glVertex3f(6.5, -3.5, 1.0);
+   glVertex3f(-1.0 , -3.5, 1.0);
+   glEnd();
+glPopMatrix();
+glEnable(GL_TEXTURE_2D);
+}
+
+void render_button(){
+    glDisable(GL_TEXTURE_2D);
+glPushMatrix();
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glBegin(GL_QUADS);
+    glVertex3f(0.7f, -0.7f, 0.001f);
+    glVertex3f(1.3f, -0.7f, 0.001f);
+    glVertex3f(1.3f, -1.3f, 0.001f);
+    glVertex3f(0.7f, -1.3f, 0.001f);
+    glEnd();
+glPopMatrix();
+    glEnable(GL_TEXTURE_2D);
+}
+
 void collision_detection(Scene* scene){
-    Rect wall[14];
-    Rect camera = {scene->camera.position.x + 0.1,scene->camera.position.y -0.1,0.1,0.2};
+    Rect wall[15];
+    Rect camera = {scene->camera.position.x - 0.1,scene->camera.position.y - 0.1,0.1,0.2};
     Wall walls;
     Rect flag = {scene->flag.position.x + 0.1,scene->flag.position.y + 0.3,0.2,0.6};
-    for(int i = 0;i < 14;i++){
+    Rect button = {0.6 , -0.8 , 0.5 , 0.5};
+    for(int i = 0;i < 15;i++){
     walls = get_wall_datas(scene->wall,i);
     wall[i].x = walls.position_a.x;
     wall[i].y = walls.position_a.y;
@@ -117,7 +156,10 @@ void collision_detection(Scene* scene){
     wall[i].h = fabs(walls.position_d.y - walls.position_a.y) ;
     }
 
-    for(int i = 0;i < 14;i++){
+    for(int i = 0;i < 15;i++){
+        if(scene->wall->is_open && i==14){
+            continue;
+        }
         if(has_intersection(&wall[i],&camera)){
             if(scene->camera.speed.y > 0){
                 set_camera_speed(&(scene->camera),0);
@@ -147,6 +189,9 @@ void collision_detection(Scene* scene){
     }
     if(has_intersection(&flag,&camera)){
         scene->game_end = 1;
+    }
+    if(has_intersection(&button,&camera)){
+        scene->wall->is_open = true;
     }
     
 }
@@ -250,4 +295,59 @@ void end_game(Scene *scene)
         glEnable(GL_FOG);
     glEnable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST);
+}
+
+void initParticles(Scene *scene) {
+    int i;
+    for (i = 0; i < scene->numParticles; i++) {
+        scene->particles[i].position[0] = 1;
+        scene->particles[i].position[1] = -1 ;
+        scene->particles[i].position[2] = 0.002;
+
+        scene->particles[i].speed[0] = (float)(rand() % 200 - 100) / 70000.0f;
+        scene->particles[i].speed[1] = (float)(rand() % 200 - 100) / 70000.0f;
+
+        scene->particles[i].color[0] = 1.0;
+        scene->particles[i].color[1] = (float)(rand() % 100) / 200;
+        scene->particles[i].color[2] = 0.001;
+    }
+}
+
+void updateParticles(Scene *scene) {
+    int i;
+    for (i = 0; i < scene->numParticles; i++) {
+        scene->particles[i].position[0] += scene->particles[i].speed[0];
+        scene->particles[i].position[1] -= scene->particles[i].speed[1];
+        
+
+         
+        if (scene->particles[i].position[1] < -1.3) {
+            scene->particles[i].position[0] = 1;
+            scene->particles[i].position[1] = -1;
+        }
+        if (scene->particles[i].position[1] > -0.7) {
+            scene->particles[i].position[0] = 1;
+            scene->particles[i].position[1] = -1;
+        }
+        if (scene->particles[i].position[0] < 0.7) {
+            scene->particles[i].position[0] = 1;
+            scene->particles[i].position[1] = -1;
+        }
+        if (scene->particles[i].position[0] > 1.3) {
+            scene->particles[i].position[0] = 1;
+            scene->particles[i].position[1] = -1;
+        }
+    }
+}
+
+
+void drawParticles(const Scene *scene) {
+    
+    glPointSize(9.0f);
+     glBegin(GL_POINTS);
+    for (int i = 0; i < scene->numParticles; i++) {
+        glColor3fv(scene->particles[i].color);
+        glVertex3fv(scene->particles[i].position);
+    }
+    glEnd();
 }

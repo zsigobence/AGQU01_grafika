@@ -1,12 +1,13 @@
 #include "flag.h"
 #include <obj/load.h>
 #include <obj/draw.h>
+#include <math.h>
 
 void init_flag(Flag* flag){
     flag->position.x = -1.2;
     flag->position.y = -1.0;
     flag->position.z = 0.29;
-    flag->rotation.x = 0.0;
+    flag->rotation.x = 1.0;
     flag->rotation.y = 0.0;
     flag->rotation.z = 0.0;
     flag->speed.x = 0.0;
@@ -31,16 +32,11 @@ glPushMatrix();
 
 void flag_movement(Flag* flag,double time){
     glPushMatrix();
-
+    double current_time = (double)SDL_GetTicks() / 1000;
     flag->position.z += flag->speed.z * time;
-    
-
-    if (flag->position.z >= 0.5) {
-        flag->speed.z = -0.2;
-    }
-    else if (flag->position.z <= 0.3) {
-        flag->speed.z = 0.2;
-    }
+    flag->position.z = sin(current_time) * 0.2 + 0.4;
+    flag->rotation.x += flag->rotation.x * time; 
+    glRotatef(-(flag->rotation.x + 90), 1, 0, 0.0);
 
     glPopMatrix();
 }

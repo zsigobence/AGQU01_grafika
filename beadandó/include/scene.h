@@ -7,7 +7,6 @@
 #include "walls.h"
 #include <SDL2/SDL.h>
 #include "camera.h"
-#include <GL/glut.h>
 #include <button.h>
 #include <obj/model.h>
 
